@@ -2,7 +2,7 @@
     "name": "com.guidoarkesteijn.deeplinking",
     "displayName": "Deep Linking",
     "author": "Guido Arkesteijn",
-    "version": "0.5",
+    "version": "0.0.1",
     "unity": "2019.1",
     "description": "Library for easy use of deeplinking in your project for different platforms.",
     "repository": {
