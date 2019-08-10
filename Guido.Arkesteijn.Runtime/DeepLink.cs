@@ -10,10 +10,13 @@ namespace Guido.Arkesteijn.DeepLink.Runtime
         public static bool Initialized { get { return Instance != null; } }
         public static DeepLink Instance { get; private set; }
 
+        public static string[] Arguments { get { return Instance.arguments; } }
+
         public delegate void DeepLinkingTriggerHandler(string key, Dictionary<string, object> pairs);
 
         private Dictionary<string, List<DeepLinkingTriggerHandler>> dictionary = new Dictionary<string, List<DeepLinkingTriggerHandler>>();
         private DeepLinkSettings settings;
+        private string[] arguments;
 
         public static void Initialize()
         {
@@ -29,6 +32,7 @@ namespace Guido.Arkesteijn.DeepLink.Runtime
 
             Instance = new DeepLink();
             Instance.settings = settings;
+            Instance.arguments = Environment.GetCommandLineArgs();
         }
         
         public void Subscribe(string key, DeepLinkingTriggerHandler handler)
