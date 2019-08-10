@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Guido.Arkesteijn.DeepLink.Runtime
 {
-    public class DeepLinking
+    public class DeepLink
     {
         public static bool Initialized { get { return Instance != null; } }
-        public static DeepLinking Instance { get; private set; }
+        public static DeepLink Instance { get; private set; }
 
         public delegate void DeepLinkingTriggerHandler(string key, Dictionary<string, object> pairs);
 
@@ -27,7 +27,7 @@ namespace Guido.Arkesteijn.DeepLink.Runtime
                 return;
             }
 
-            Instance = new DeepLinking();
+            Instance = new DeepLink();
             Instance.settings = settings;
         }
         
