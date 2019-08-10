@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Guido.Arkesteijn.Runtime
+namespace Guido.Arkesteijn.DeepLink.Runtime
 {
-    [CreateAssetMenu(menuName = "Guido Arkesteijn/Deep Linking", fileName = nameof(DeepLinkingSettings))]
-    public class DeepLinkingSettings : ScriptableObject
+    [CreateAssetMenu(menuName = "Guido Arkesteijn/Deep Linking", fileName = nameof(DeepLinkSettings))]
+    public class DeepLinkSettings : ScriptableObject
     {
-        public static DeepLinkingSettings DefaultSettings
+        public static DeepLinkSettings DefaultSettings
         {
             get
             {
-                DeepLinkingSettings defaultSettings = CreateInstance(typeof(DeepLinkingSettings)) as DeepLinkingSettings;
+                DeepLinkSettings defaultSettings = CreateInstance(typeof(DeepLinkSettings)) as DeepLinkSettings;
                 return defaultSettings;
             }
         }

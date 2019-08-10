@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Guido.Arkesteijn.Runtime
+namespace Guido.Arkesteijn.DeepLink.Runtime
 {
     public class DeepLinking
     {
@@ -12,14 +13,14 @@ namespace Guido.Arkesteijn.Runtime
         public delegate void DeepLinkingTriggerHandler(string key, Dictionary<string, object> pairs);
 
         private Dictionary<string, List<DeepLinkingTriggerHandler>> dictionary = new Dictionary<string, List<DeepLinkingTriggerHandler>>();
-        private DeepLinkingSettings settings;
+        private DeepLinkSettings settings;
 
         public static void Initialize()
         {
-            Initialize(DeepLinkingSettings.DefaultSettings);
+            Initialize(DeepLinkSettings.DefaultSettings);
         }
 
-        public static void Initialize(DeepLinkingSettings settings)
+        public static void Initialize(DeepLinkSettings settings)
         {
             if(Initialized)
             {
