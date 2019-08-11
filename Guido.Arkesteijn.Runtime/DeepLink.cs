@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Guido.Arkesteijn.DeepLink.Runtime
@@ -10,13 +12,10 @@ namespace Guido.Arkesteijn.DeepLink.Runtime
         public static bool Initialized { get { return Instance != null; } }
         public static DeepLink Instance { get; private set; }
 
-        public static string[] Arguments { get { return Instance.arguments; } }
-
-        public delegate void DeepLinkingTriggerHandler(string key, Dictionary<string, object> pairs);
-
-        private Dictionary<string, List<DeepLinkingTriggerHandler>> dictionary = new Dictionary<string, List<DeepLinkingTriggerHandler>>();
+        public string ArgumentString { get { return argumentParser != null ? argumentParser.ToString() : ""; } }
+        public Dictionary<string, object> Payload { get { return argumentParser.GetPayload(); } }
         private DeepLinkSettings settings;
-        private string[] arguments;
+        private IDeepLinkArgumentParser argumentParser;
 
         public static void Initialize()
         {
@@ -30,40 +29,56 @@ namespace Guido.Arkesteijn.DeepLink.Runtime
                 return;
             }
 
-            Instance = new DeepLink();
-            Instance.settings = settings;
-            Instance.arguments = Environment.GetCommandLineArgs();
-        }
-        
-        public void Subscribe(string key, DeepLinkingTriggerHandler handler)
-        {
-            if(dictionary.ContainsKey(key))
-            {
-                dictionary[key].Add(handler);
-            }
-            else
-            {
-                dictionary.Add(key, new List<DeepLinkingTriggerHandler>() { handler });
-            }
+#if UNITY_EDITOR
+            Instance = new DeepLink(settings, new DeepLinkArgumentParser(settings, new string[] { "PATH", "guidoarkesteijn:product:1" }));
+#else
+            Instance = new DeepLink(settings, new DeepLinkArgumentParser(settings, Environment.GetCommandLineArgs()));
+#endif
         }
 
-        public void Unsubscribe(string key, DeepLinkingTriggerHandler handler)
+        private DeepLink(DeepLinkSettings deepLinkSettings, IDeepLinkArgumentParser argumentParser)
         {
-            if(dictionary.ContainsKey(key))
-            {
-                dictionary[key].Remove(handler);
-            }
+            this.settings = deepLinkSettings;
+            this.argumentParser = argumentParser;
         }
 
-        public void Trigger(string key, Dictionary<string, object> payLoad)
+        public void CallMethods()
         {
-            if(dictionary.ContainsKey(key))
+            SendEvent();
+        }
+
+        private void SendEvent()
+        {
+            if(Payload != null && Payload.Count > 0)
             {
-                foreach (var item in dictionary[key])
+                foreach (var item in Payload)
                 {
-                    item(key, payLoad);
+                    var methods = MethodCache.GetMethodsWithAttribute<DeepLinkAttribute>();
+
+                    foreach (var method in methods)
+                    {
+                        DeepLinkAttribute attribute = method.GetCustomAttribute<DeepLinkAttribute>();
+
+                        if (attribute.uri == item.Key)
+                        {
+                            if (item.Value == null)
+                            {
+                                InvokeMethod(method, null);
+                            }
+                            else
+                            {
+                                InvokeMethod(method, new object[] { item.Value });
+                            }
+                        }
+                    }
                 }
             }
+        }
+        
+        private void InvokeMethod(MethodInfo methodInfo, object[] parameters)
+        {
+            // null because the method needs to be static.
+            methodInfo.Invoke(null, parameters);
         }
     }
 }
